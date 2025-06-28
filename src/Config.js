@@ -8,10 +8,12 @@ const api = axios.create({
   },
 });
 
+
 // Function to fetch data from the endpoint
 export const fetchData = async () => {
   try {
     const response = await api.get("/data"); // Make the GET request
+    console.log("----response-----",response);
     return response.data; // Return the response data
   } catch (error) {
     console.error("Error fetching data:", error.message); // Log any errors

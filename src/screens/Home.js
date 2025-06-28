@@ -3,22 +3,23 @@ import "./Home.css";
 import SearchBar from "../components/SearchBar";
 import Filter from "../components/Filter";
 import api from "../Config";
+import SortDropdown from "../components/SortDropdown";
 
 const Home = () => {
-  const [items, setItems] = useState([]);
-  const [filteredItems, setFilteredItems] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [items, setItems] = useState([]); // Store API data
+  const [filteredItems, setFilteredItems] = useState([]); // Store filtered items
+  const [loading, setLoading] = useState(false); // Track loading state
+  const [page, setPage] = useState(1); // Pagination or infinite scroll tracking
+  const [searchTerm, setSearchTerm] = useState(""); // Track the search term
 
   useEffect(() => {
     const fetchItems = async () => {
       setLoading(true);
       try {
-        const response = await api.get(`/data?page=${page}&size=12`);
+        const response = await api.get(`/data?page=${page}&size=12`); // Fetch items with pagination
         const newItems = response.data;
-        setItems((prevItems) => [...prevItems, ...newItems]);
-        setFilteredItems((prevItems) => [...prevItems, ...newItems]);
+        setItems((prevItems) => [...prevItems, ...newItems]); // Append new items
+        setFilteredItems((prevItems) => [...prevItems, ...newItems]); // Append to filtered items
       } catch (error) {
         console.error("Error fetching API data:", error.message);
       } finally {
@@ -43,7 +44,7 @@ const Home = () => {
   const handleSearch = (term) => {
     setSearchTerm(term);
     if (term.trim() === "") {
-      setFilteredItems(items);
+      setFilteredItems(items); // If the search term is empty, show all items
     } else {
       const lowerCaseTerm = term.toLowerCase();
       const filtered = items.filter(
@@ -55,6 +56,33 @@ const Home = () => {
     }
   };
 
+  const handleSortChange = (sortOption) => {
+  let sortedItems = [...filteredItems];
+  if (sortOption === "highPrice") {
+    sortedItems.sort((a, b) => b.price - a.price); // Sort by higher price
+  } else if (sortOption === "lowPrice") {
+    sortedItems.sort((a, b) => a.price - b.price); // Sort by lower price
+  } else {
+    sortedItems.sort((a, b) => a.title.localeCompare(b.title)); // Sort by Item Name
+  }
+  setFilteredItems(sortedItems); // Update filtered items after sorting
+};
+
+
+  const handleScroll = () => {
+    if (
+      window.innerHeight + document.documentElement.scrollTop >=
+      document.documentElement.offsetHeight - 100
+    ) {
+      setPage((prevPage) => prevPage + 1); // Increment page number to load more data
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <div className="black-screen">
       <div className="search-bar-container">
@@ -64,7 +92,9 @@ const Home = () => {
         />
       </div>
       <div className="filter-container-inhome">
-        <Filter onFilterChange={handleFilterChange} />
+        <Filter onFilterChange={handleFilterChange}/>
+        <SortDropdown onSortChange={handleSortChange} />
+
       </div>
       <div className="content-grid">
         {filteredItems.map((item) => (
@@ -73,7 +103,7 @@ const Home = () => {
             <div className="grid-details">
               <div className="grid-info">
                 <h3>{item.title}</h3>
-                <p>{item.creator}</p>
+                <p>Created by: {item.creator}</p>
               </div>
               <div className="grid-pricing">
                 <p>
