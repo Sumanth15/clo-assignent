@@ -12,24 +12,62 @@ const Home = () => {
   const [page, setPage] = useState(1); // Pagination or infinite scroll tracking
   const [searchTerm, setSearchTerm] = useState(""); // Track the search term
 
+  // useEffect(() => {
+  //   const fetchItems = async () => {
+  //     setLoading(true);
+  //     try {
+  //       const response = await api.get(`/data?page=${page}&size=12`); // Fetch items with pagination
+  //       const newItems = response.data;
+  //       setItems((prevItems) => [...prevItems, ...newItems]); // Append new items
+  //       setFilteredItems((prevItems) => [...prevItems, ...newItems]); // Append to filtered items
+  //     } catch (error) {
+  //       console.error("Error fetching API data:", error.message);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchItems();
+  // }, [page]);
+
   useEffect(() => {
-    const fetchItems = async () => {
-      setLoading(true);
-      try {
-        const response = await api.get(`/data?page=${page}&size=12`); // Fetch items with pagination
-        const newItems = response.data;
-        setItems((prevItems) => [...prevItems, ...newItems]); // Append new items
-        setFilteredItems((prevItems) => [...prevItems, ...newItems]); // Append to filtered items
-      } catch (error) {
-        console.error("Error fetching API data:", error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchItems = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get(`/data?page=${page}&size=12`); // Fetch items with pagination
+      const newItems = response.data;
 
-    fetchItems();
-  }, [page]);
+      setItems((prevItems) => {
+        const uniqueItems = [
+          ...prevItems,
+          ...newItems.filter((newItem) =>
+            !prevItems.some((prevItem) => prevItem.id === newItem.id)
+          ),
+        ];
+        return uniqueItems;
+      });
 
+      setFilteredItems((prevItems) => {
+        const uniqueItems = [
+          ...prevItems,
+          ...newItems.filter((newItem) =>
+            !prevItems.some((prevItem) => prevItem.id === newItem.id)
+          ),
+        ];
+        return uniqueItems;
+      });
+    } catch (error) {
+      console.error("Error fetching API data:", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchItems();
+}, [page]);
+
+  
+  
   const handleFilterChange = ({ pricingOptions, priceRange }) => {
     const filtered = items.filter((item) => {
       const matchesPriceRange =
