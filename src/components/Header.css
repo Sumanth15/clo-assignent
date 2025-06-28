@@ -1,0 +1,32 @@
+/* Header.css */
+.header {
+  background-color: #000; /* Dark gray header */
+  color: white;
+  padding: 0.8rem 1rem;
+  display: flex;
+  justify-content: space-between; /* Space between title and button */
+  align-items: center;
+  font-size: 0.8rem;
+  font-family: Arial, sans-serif;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.header-button {
+  background-color: #b860f3; /* Button background color */
+  color: #000;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.header-button:hover {
+  background-color: #c27bf2; /* Darker blue on hover */
+}
